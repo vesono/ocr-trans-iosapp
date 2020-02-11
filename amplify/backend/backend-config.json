@@ -1,0 +1,15 @@
+{
+	"auth": {
+		"ocrtransiosapp33c8abde": {
+			"service": "Cognito",
+			"providerPlugin": "awscloudformation",
+			"dependsOn": []
+		}
+	},
+	"storage": {
+		"s304feb608": {
+			"service": "S3",
+			"providerPlugin": "awscloudformation"
+		}
+	}
+}

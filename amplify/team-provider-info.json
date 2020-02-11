@@ -1,0 +1,20 @@
+{
+    "test": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-ocr-trans-iosapp-test-120447-authRole",
+            "UnauthRoleArn": "arn:aws:iam::034228666730:role/amplify-ocr-trans-iosapp-test-120447-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::034228666730:role/amplify-ocr-trans-iosapp-test-120447-authRole",
+            "Region": "ap-northeast-1",
+            "DeploymentBucketName": "amplify-ocr-trans-iosapp-test-120447-deployment",
+            "UnauthRoleName": "amplify-ocr-trans-iosapp-test-120447-unauthRole",
+            "StackName": "amplify-ocr-trans-iosapp-test-120447",
+            "StackId": "arn:aws:cloudformation:ap-northeast-1:034228666730:stack/amplify-ocr-trans-iosapp-test-120447/44e7c5f0-4c7b-11ea-a9f0-0e36924addac",
+            "AmplifyAppId": "d1nmq7jtemsh56"
+        },
+        "categories": {
+            "auth": {
+                "ocrtransiosapp33c8abde": {}
+            }
+        }
+    }
+}
