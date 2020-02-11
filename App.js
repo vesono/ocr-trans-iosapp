@@ -1,21 +1,25 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { Component } from 'react';
+import { Container, View, Header, Left,
+         Body, Right, Button, Title, Text, Thumbnail } from 'react-native';
 
-const App = () => {
-  return (
-    <View style={styles.container}>
-      <Text>Hello World!</Text>
-    </View>
-  );
+export default class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {image: null,};
+    this.showPicker = this.showPicker.bind(this);
+  }
+
+  showPicker() {
+    alert("アラート表示");
+    console.log("コンソールログ")
+  }
+
+  render() {
+    return (
+      <View style={{flex:1, paddingVertical:80, alignItems:'center'}}>
+        <Text>Open up App.js to start working on your app!</Text>
+         <Button title="Click Me" onPress={this.showPicker} />
+      </View>
+    );
+  }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
-
-export default App;
