@@ -2,7 +2,7 @@ type OcrImage @model {
 	id: ID!
 	user_name: String!
 	image_name: String!
-	image_url: Int
+	image_url: String
 	ocr_result: String
 	trans_result: String
 }
