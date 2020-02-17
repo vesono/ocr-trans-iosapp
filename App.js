@@ -11,6 +11,7 @@ import API, { graphqlOperation } from '@aws-amplify/api';
 import awsconfig from './aws-exports';
 import { listOcrImages } from './src/graphql/queries';
 import { createOcrImage } from './src/graphql/mutations';
+import { onCreateOcrImage } from './src/graphql/subscriptions';
 
 Amplify.configure(awsconfig);
 API.configure(awsconfig);
@@ -60,7 +61,6 @@ const s3Get = async imageName => {
   /**
    * s3get処理
    */
-  console.log(imageName);
   const presignedUrl = await Storage.get(imageName, {
     expire: 1800
   });
@@ -122,12 +122,20 @@ const App = () => {
   useEffect(() => {
     const getData = async () => {
       const listData = await API.graphql(graphqlOperation(listOcrImages));
-      arrayData = listData.data.listOcrImages.items;
-      arrayData[0].image_url = await s3Get(arrayData[0].image_url);
-      dispatch({ type: 'LIST', images: arrayData });
+      const arrayData = listData.data.listOcrImages.items;
+      const arrayDataGetUrl = await Promise.all(arrayData.map( async value => ({
+        id: value.id,
+        image_name: value.image_name,
+        image_url: await s3Get(value.image_url),
+        ocr_result: value.ocr_result,
+        trans_result: value.trans_result,
+        user_name: value.user_name
+      })));
+      dispatch({ type: 'LIST', images: arrayDataGetUrl });
     }
     getPermissionAsync();
     getData();
+    console.log('state');
     console.log(state);
   }, []);
 
