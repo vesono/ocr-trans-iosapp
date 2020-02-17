@@ -6,7 +6,7 @@ import * as ImagePicker from 'expo-image-picker';
 import Constants from 'expo-constants';
 import * as Permissions from 'expo-permissions';
 import { Buffer } from 'buffer'
-import Amplify, { Storage, Auth } from 'aws-amplify';
+import Amplify, { Storage } from 'aws-amplify';
 import API, { graphqlOperation } from '@aws-amplify/api';
 import awsconfig from './aws-exports';
 import { listOcrImages } from './src/graphql/queries';
@@ -39,7 +39,8 @@ const insertNewImage = async (imageName, imageS3Name) => {
     ocr_result: 'test_ocr_result',
     trans_result: 'test_trans_result',
   };
-  await API.graphql(graphqlOperation(createOcrImage, { input: newImage }));
+  const result = await API.graphql(graphqlOperation(createOcrImage, { input: newImage }));
+  console.log(result);
 }
 
 const s3Upload = async (imageName, base64Data) => {
@@ -73,7 +74,7 @@ const App = () => {
      */
     switch (action.type) {
       case 'ADD':
-        return {...state, images: [...state.images]};
+        return {...state, images: [...state.images, action.image]};
       case 'LIST':
         return {...state, images: action.images};
       default:
@@ -92,7 +93,7 @@ const App = () => {
       }
     }
   }
-  
+
   const pickImage = async () => {
     /**
      * ライブラリーから選択して画像取得
@@ -111,15 +112,13 @@ const App = () => {
       const imageFileName = result.uri.split('/').slice(-1)[0];
       const s3fileName = nowtime() + '_' + imageFileName;
       await s3Upload(s3fileName, result.base64);
-      // url取得
-      const s3PresignedUrl = await s3Get(s3fileName);
       // DB追加
       await insertNewImage(imageFileName, s3fileName);
-      dispatch({ type: 'ADD', images: s3PresignedUrl });
     }
   }
 
   const [state, dispatch] = useReducer(reducer, initialState);
+
   useEffect(() => {
     const getData = async () => {
       const listData = await API.graphql(graphqlOperation(listOcrImages));
