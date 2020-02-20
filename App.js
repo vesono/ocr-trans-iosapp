@@ -1,17 +1,18 @@
 import React, { useReducer, useEffect } from 'react';
-import { Image } from 'react-native';
-import { Container, Header, Content, Button, Text, Thumbnail,
+import { StyleSheet, Image } from 'react-native';
+import { Container, Content, Button, Text,
          Card, CardItem, Icon, Left, Body, Right } from 'native-base';
 import * as ImagePicker from 'expo-image-picker';
 import Constants from 'expo-constants';
 import * as Permissions from 'expo-permissions';
 import { Buffer } from 'buffer'
-import Amplify, { Storage } from 'aws-amplify';
-import API, { graphqlOperation } from '@aws-amplify/api';
+import Amplify, { Storage, I18n } from 'aws-amplify';
+import API from '@aws-amplify/api';
 import awsconfig from './aws-exports';
-import { listOcrImages } from './src/graphql/queries';
-import { createOcrImage } from './src/graphql/mutations';
-import { onCreateOcrImage } from './src/graphql/subscriptions';
+import { withAuthenticator } from 'aws-amplify-react-native';
+import HeaderCom from './src/home/Header';
+import FooterCom from './src/home/Footer';
+import { insertNewImage, deleteImage, listImage } from './src/db_function/query';
 
 Amplify.configure(awsconfig);
 API.configure(awsconfig);
@@ -27,21 +28,6 @@ const nowtime = () => {
    */
   const moment = require('moment');
   return moment().format('YYYYMMDDHHmmssSSS');
-}
-
-const insertNewImage = async (imageName, imageS3Name) => {
-  /**
-   * DB追加処理
-   */
-  const newImage = {
-    user_name: 'test_user',
-    image_name: imageName,
-    image_url: imageS3Name,
-    ocr_result: 'test_ocr_result',
-    trans_result: 'test_trans_result',
-  };
-  const result = await API.graphql(graphqlOperation(createOcrImage, { input: newImage }));
-  console.log(result);
 }
 
 const s3Upload = async (imageName, base64Data) => {
@@ -121,27 +107,23 @@ const App = () => {
 
   useEffect(() => {
     const getData = async () => {
-      const listData = await API.graphql(graphqlOperation(listOcrImages));
+      const listData = await listImage();
       const arrayData = listData.data.listOcrImages.items;
       const arrayDataGetUrl = await Promise.all(arrayData.map( async value => ({
-        id: value.id,
-        image_name: value.image_name,
-        image_url: await s3Get(value.image_url),
-        ocr_result: value.ocr_result,
-        trans_result: value.trans_result,
-        user_name: value.user_name
+        ...value, image_url: await s3Get(value.image_url)
       })));
       dispatch({ type: 'LIST', images: arrayDataGetUrl });
     }
     getPermissionAsync();
     getData();
+    
     console.log('state');
     console.log(state);
   }, []);
 
   return (
     <Container>
-    <Header />
+    <HeaderCom />
     <Content>
       <Button light
        onPress={() => pickImage()}
@@ -158,10 +140,19 @@ const App = () => {
                   <Text note>{image.image_name}</Text>
                 </Body>
               </Left>
+              <Body>
+              </Body>
+              <Right>
+                <Button bordered
+                onPress={() => deleteImage(image.id)}>
+                  <Icon type="AntDesign" name="delete"
+                        style={{fontSize: 20}}/>
+                </Button>
+              </Right>
             </CardItem>
             <CardItem cardBody>
-            <Image source={{uri: image.image_url}}
-                    style={{height: 200, width: null, flex: 1}}/>
+              <Image source={{uri: image.image_url}}
+                     style={styles.image}/>
             </CardItem>
             <CardItem>
               <Left>
@@ -185,8 +176,37 @@ const App = () => {
         <Text></Text>
       }
     </Content>
+    <FooterCom />
   </Container>
   );
 }
 
-export default App;
+const styles = StyleSheet.create({
+  image: {
+    height: 200,
+    width: null,
+    flex: 1
+  }
+});
+
+
+// export default App;
+
+const dict = {
+  'ja': {
+    'Sign in to your account': "ログイン",
+    'Create a new account': "アカウント作成",
+    'Username': "メールアドレス",
+    'Password': "パスワード"
+
+    
+   }
+};
+
+I18n.putVocabularies(dict);
+I18n.setLanguage('ja');
+
+export default withAuthenticator(App, {
+  signUpConfig: {
+    hiddenDefaults: ["email", "phone_number"]
+}});
