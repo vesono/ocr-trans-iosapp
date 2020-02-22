@@ -21,7 +21,6 @@ export const insertNewImage = async (imageName, imageS3Name) => {
     trans_result: 'test_trans_result',
   };
   const result = await API.graphql(graphqlOperation(createOcrImage, { input: newImage }));
-  console.log(result);
 }
 
 export const deleteImage = async delid => {

@@ -1,4 +1,8 @@
-type OcrImage @model {
+type OcrImage
+	@model
+	@auth(rules: [{allow: owner}])
+	@key(name: "NameSelect", fields:["image_url", "user_name"], queryField: "NameListSelect" )
+{
 	id: ID!
 	user_name: String!
 	image_name: String!

@@ -13,6 +13,7 @@ export const createOcrImage = /* GraphQL */ `
       image_url
       ocr_result
       trans_result
+      owner
     }
   }
 `;
@@ -28,6 +29,7 @@ export const updateOcrImage = /* GraphQL */ `
       image_url
       ocr_result
       trans_result
+      owner
     }
   }
 `;
@@ -43,6 +45,7 @@ export const deleteOcrImage = /* GraphQL */ `
       image_url
       ocr_result
       trans_result
+      owner
     }
   }
 `;

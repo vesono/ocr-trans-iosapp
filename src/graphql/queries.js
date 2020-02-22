@@ -10,6 +10,7 @@ export const getOcrImage = /* GraphQL */ `
       image_url
       ocr_result
       trans_result
+      owner
     }
   }
 `;
@@ -27,6 +28,37 @@ export const listOcrImages = /* GraphQL */ `
         image_url
         ocr_result
         trans_result
+        owner
+      }
+      nextToken
+    }
+  }
+`;
+export const nameListSelect = /* GraphQL */ `
+  query NameListSelect(
+    $image_url: String
+    $user_name: ModelStringKeyConditionInput
+    $sortDirection: ModelSortDirection
+    $filter: ModelOcrImageFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    NameListSelect(
+      image_url: $image_url
+      user_name: $user_name
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        user_name
+        image_name
+        image_url
+        ocr_result
+        trans_result
+        owner
       }
       nextToken
     }

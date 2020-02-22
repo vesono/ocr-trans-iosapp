@@ -1,5 +1,11 @@
 {
     "AppSyncApiName": "ocrTransIosapp",
     "DynamoDBBillingMode": "PAY_PER_REQUEST",
-    "DynamoDBEnableServerSideEncryption": "false"
+    "DynamoDBEnableServerSideEncryption": "false",
+    "AuthCognitoUserPoolId": {
+        "Fn::GetAtt": [
+            "authocrtransiosapp33c8abde",
+            "Outputs.UserPoolId"
+        ]
+    }
 }
