@@ -1,18 +1,21 @@
 import React, { useState, useReducer, useEffect } from 'react';
 import { StyleSheet, Image } from 'react-native';
-import { Container, Content, Button, Text, Header,
+import { Container, Content, Button, Text, Picker,
          Card, CardItem, Icon, Left, Body, Right, View } from 'native-base';
 import Constants from 'expo-constants';
 import * as Permissions from 'expo-permissions';
 import Amplify, { Auth, I18n } from 'aws-amplify';
 import API, { graphqlOperation } from '@aws-amplify/api';
 import awsconfig from './aws-exports';
+import PubSub from '@aws-amplify/pubsub';
 import { withAuthenticator } from 'aws-amplify-react-native';
+import { onCreateOcrImage } from './src/graphql/subscriptions'
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import FooterCom from './src/home/Footer';
+import { ImageDetail } from './src/detail/ImageDetail'
 import { deleteImage, listImage } from './src/db_function/query';
 import { s3Get } from './src/db_function/storage';
-import PubSub from '@aws-amplify/pubsub';
-import { onCreateOcrImage } from './src/graphql/subscriptions'
 
 Amplify.configure(awsconfig);
 API.configure(awsconfig);
@@ -23,7 +26,7 @@ const initialState = {
   images: []
 }
 
-const App = () => {
+const HomeCom = props => {
   const reducer = (state, action) => {
     /**
      * reducer定義
@@ -49,6 +52,15 @@ const App = () => {
       }
     }
   }
+
+  const { navigation } = props;
+  navigation.setOptions({
+    headerRight: () => (
+      <Button transparent >
+        <Icon type="SimpleLineIcons" name="menu" />
+      </Button>
+    )
+  });
 
   const [state, dispatch] = useReducer(reducer, initialState);
   const [user, setUser] = useState(null);
@@ -90,7 +102,6 @@ const App = () => {
 
   return (
     <Container>
-    <Header />
     <Content>
       <View style={styles.content}>
       { state.images.length >0 ?
@@ -112,7 +123,10 @@ const App = () => {
             <CardItem>
               <Left />
               <Right>
-                <Text>11h ago</Text>
+                <Button bordered small
+                       onPress={() => navigation.navigate('Detail')}>
+                 <Icon type="AntDesign" name="ellipsis1" />
+               </Button>
               </Right>
             </CardItem>
           </Card>
@@ -142,6 +156,19 @@ const styles = StyleSheet.create({
     flex: 1
   }
 });
+
+const Stack = createStackNavigator();
+
+const App = () => {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen name="Home" component={HomeCom} />
+        <Stack.Screen name="Detail" component={ImageDetail} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
 
 const dict = {
   'ja': {
