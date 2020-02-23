@@ -1,7 +1,7 @@
 import React, { useState, useReducer, useEffect } from 'react';
-import { StyleSheet, Image } from 'react-native';
+import { StyleSheet} from 'react-native';
 import { Container, Content, Button, Text, Picker,
-         Card, CardItem, Icon, Left, Body, Right, View } from 'native-base';
+         Icon, Left, Body, Right, View } from 'native-base';
 import Constants from 'expo-constants';
 import * as Permissions from 'expo-permissions';
 import Amplify, { Auth, I18n } from 'aws-amplify';
@@ -12,9 +12,10 @@ import { withAuthenticator } from 'aws-amplify-react-native';
 import { onCreateOcrImage } from './src/graphql/subscriptions'
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import CardCom from './src/home/Card';
 import FooterCom from './src/home/Footer';
 import { ImageDetail } from './src/detail/ImageDetail'
-import { deleteImage, listImage } from './src/db_function/query';
+import { listImage } from './src/db_function/query';
 import { s3Get } from './src/db_function/storage';
 
 Amplify.configure(awsconfig);
@@ -106,30 +107,8 @@ const HomeCom = props => {
       <View style={styles.content}>
       { state.images.length >0 ?
           state.images.map( image => (
-          <Card key={image.id} style={styles.card}>
-            <CardItem>
-              <Left />
-              <Right>
-                <Button bordered small danger
-                        onPress={() => deleteImage(image.id)}>
-                  <Icon type="AntDesign" name="delete" />
-                </Button>
-              </Right>
-            </CardItem>
-            <CardItem cardBody>
-              <Image source={{uri: image.image_url}}
-                     style={styles.image}/>
-            </CardItem>
-            <CardItem>
-              <Left />
-              <Right>
-                <Button bordered small
-                       onPress={() => navigation.navigate('Detail')}>
-                 <Icon type="AntDesign" name="ellipsis1" />
-               </Button>
-              </Right>
-            </CardItem>
-          </Card>
+          <CardCom image={image}
+                   navigation={navigation} />
           )) :
         <Text></Text>
       }
@@ -146,14 +125,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'flex-start'
-  },
-  card: {
-    width: '49%'
-  },
-  image: {
-    height: 150,
-    width: null,
-    flex: 1
   }
 });
 
