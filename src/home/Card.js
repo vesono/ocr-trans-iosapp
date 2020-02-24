@@ -19,14 +19,16 @@ const CardCom = props => {
         </Right>
       </CardItem>
       <CardItem cardBody>
-        <Image source={{uri: image.image_url}}
+        <Image source={{uri: image.s3_url}}
                style={styles.image}/>
       </CardItem>
       <CardItem>
         <Left />
         <Right>
           <Button bordered small
-                  onPress={() => navigation.navigate('Detail')}>
+                  onPress={() => navigation.navigate('Detail', {
+                    image: image
+                  })}>
            <Icon type="AntDesign" name="ellipsis1" />
          </Button>
         </Right>
@@ -37,7 +39,7 @@ const CardCom = props => {
 
 const styles = StyleSheet.create({
   card: {
-    width: '49%'
+    width: '48%'
   },
   image: {
     height: 150,

@@ -1,9 +1,6 @@
 import React, { useState, useReducer, useEffect } from 'react';
 import { StyleSheet} from 'react-native';
-import { Container, Content, Button, Text, Picker,
-         Icon, Left, Body, Right, View } from 'native-base';
-import Constants from 'expo-constants';
-import * as Permissions from 'expo-permissions';
+import { Container, Content, Button, Text, Icon, View } from 'native-base';
 import Amplify, { Auth, I18n } from 'aws-amplify';
 import API, { graphqlOperation } from '@aws-amplify/api';
 import awsconfig from './aws-exports';
@@ -42,18 +39,6 @@ const HomeCom = props => {
     }
   }
 
-  const getPermissionAsync = async () => {
-    /**
-     * カメラロールpermission取得
-     */
-    if (Constants.platform.ios) {
-      const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-      if (status !== 'granted') {
-        alert('Sorry, we need camera roll permissions to make this work!');
-      }
-    }
-  }
-
   const { navigation } = props;
   navigation.setOptions({
     headerRight: () => (
@@ -77,7 +62,7 @@ const HomeCom = props => {
       const listData = await listImage();
       const arrayData = listData.data.listOcrImages.items;
       const arrayDataGetUrl = await Promise.all(arrayData.map( async value => ({
-        ...value, image_url: await s3Get(value.image_url)
+        ...value, s3_url: await s3Get(value.image_url)
       })));
       dispatch({ type: 'LIST', images: arrayDataGetUrl });
     }
@@ -87,13 +72,12 @@ const HomeCom = props => {
       subscription = API.graphql(graphqlOperation(onCreateOcrImage, {owner: user.username})).subscribe({
         next: async eventData => {
           const image = eventData.value.data.onCreateOcrImage;
-          image.image_url = await s3Get(image.image_url);
+          image.s3_url = await s3Get(image.image_url);
           dispatch({ type: 'ADD', image });
         }
       });
     });
 
-    getPermissionAsync();
     getData();
     console.log(state);
     return () => {
@@ -103,18 +87,18 @@ const HomeCom = props => {
 
   return (
     <Container>
-    <Content>
-      <View style={styles.content}>
-      { state.images.length >0 ?
-          state.images.map( image => (
-          <CardCom image={image}
-                   navigation={navigation} />
-          )) :
-        <Text></Text>
-      }
-      </View>
-    </Content>
-    <FooterCom />
+      <Content>
+        <View style={styles.content}>
+        { state.images.length >0 ?
+            state.images.map( image => (
+            <CardCom image={image}
+                     navigation={navigation} />
+            )) :
+          <Text></Text>
+        }
+        </View>
+      </Content>
+      <FooterCom />
   </Container>
   );
 }
