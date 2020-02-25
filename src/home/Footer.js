@@ -4,7 +4,7 @@ import { Button, Footer, Icon, Left, Body, Right } from 'native-base';
 import * as ImagePicker from 'expo-image-picker';
 import Constants from 'expo-constants';
 import * as Permissions from 'expo-permissions';
-import { insertNewImage, sendCloudVison } from '../../src/db_function/query';
+import { insertNewImage } from '../../src/db_function/query';
 import { s3Upload } from '../../src/db_function/storage';
 
 const nowtime = () => {
@@ -47,11 +47,8 @@ const FooterCom = () => {
       const imageFileName = result.uri.split('/').slice(-1)[0];
       const s3fileName = nowtime() + '_' + imageFileName;
       await s3Upload(s3fileName, result.base64);
-      // OCR処理
-      const ocrResult = await sendCloudVison(result.base64);
-      console.log(ocrResult);
       // DB追加
-      await insertNewImage(imageFileName, s3fileName, ocrResult);
+      await insertNewImage(imageFileName, s3fileName);
     }
   }
 

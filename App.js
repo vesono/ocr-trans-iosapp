@@ -9,6 +9,7 @@ import { withAuthenticator } from 'aws-amplify-react-native';
 import { onCreateOcrImage } from './src/graphql/subscriptions'
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+
 import CardCom from './src/home/Card';
 import FooterCom from './src/home/Footer';
 import { ImageDetail } from './src/detail/ImageDetail'
@@ -34,22 +35,26 @@ const HomeCom = props => {
         return {...state, images: [...state.images, action.image]};
       case 'LIST':
         return {...state, images: action.images};
+      case 'DELETE':
+        return {...state, images: action.images};
       default:
         return state;
     }
   }
 
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const [user, setUser] = useState(null);    // ユーザーのstate管理
+  const [edit, setEdit] = useState(false);   // 編集モードのstate管理
+
   const { navigation } = props;
   navigation.setOptions({
     headerRight: () => (
-      <Button transparent >
-        <Icon type="SimpleLineIcons" name="menu" />
+      <Button transparent 
+        onPress={() => setEdit(!edit)}>
+        <Icon type="AntDesign" name="ellipsis1" />
       </Button>
     )
   });
-
-  const [state, dispatch] = useReducer(reducer, initialState);
-  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const getUser = async () => {
@@ -92,7 +97,8 @@ const HomeCom = props => {
         { state.images.length >0 ?
             state.images.map( image => (
             <CardCom image={image}
-                     navigation={navigation} />
+                     navigation={navigation}
+                     edit={edit} />
             )) :
           <Text></Text>
         }
@@ -105,6 +111,7 @@ const HomeCom = props => {
 
 const styles = StyleSheet.create({
   content: {
+    paddingTop: 10,
     flex: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
