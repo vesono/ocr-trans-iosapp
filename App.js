@@ -26,10 +26,12 @@ const initialState = {
 }
 
 const HomeCom = props => {
+  /**
+   * reducer定義
+   * @param {*} state 
+   * @param {*} action 
+   */
   const reducer = (state, action) => {
-    /**
-     * reducer定義
-     */
     switch (action.type) {
       case 'ADD':
         return {...state, images: [...state.images, action.image]};

@@ -11,10 +11,12 @@ export const ImageDetail = props => {
   const image = props.route.params.image;
   const [ocrText, setOcr] = useState(image.ocr_result);
 
+  /**
+   * 画像ocr処理
+   * @param {string} id 
+   * @param {string} imageName 
+   */
   const ocrImage = async (id, imageName) => {
-    /**
-     * 画像OCR処理
-     */
     const imageData = await s3GetObject(imageName)
     const imageDataBase64 = imageData.Body.toString('base64')
     const result = await sendCloudVison(imageDataBase64);

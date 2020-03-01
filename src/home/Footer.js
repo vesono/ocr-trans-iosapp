@@ -7,18 +7,17 @@ import * as Permissions from 'expo-permissions';
 import { insertNewImage } from '../../src/db_function/query';
 import { s3Upload } from '../../src/db_function/storage';
 
+/**
+ * 現在時刻取得
+ */
 const nowtime = () => {
-  /**
-   * 現在時刻取得
-   */
   const moment = require('moment');
   return moment().format('YYYYMMDDHHmmssSSS');
 }
-
+/**
+ * カメラロールpermission取得
+ */
 const getPermissionAsync = async () => {
-  /**
-   * カメラロールpermission取得
-   */
   if (Constants.platform.ios) {
     const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
     if (status !== 'granted') {
@@ -29,10 +28,10 @@ const getPermissionAsync = async () => {
 
 const FooterCom = () => {
 
+  /**
+   * ライブラリーから選択して画像取得
+   */
   const pickImage = async () => {
-    /**
-     * ライブラリーから選択して画像取得
-     */
     await getPermissionAsync();
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,

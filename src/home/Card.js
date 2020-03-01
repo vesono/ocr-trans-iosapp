@@ -43,7 +43,7 @@ const CardCom = props => {
 
 const styles = StyleSheet.create({
   card: {
-    width: '48%'
+    flex: 0.5
   },
   image: {
     height: 200,
