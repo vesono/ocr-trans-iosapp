@@ -46,3 +46,11 @@ export const s3GetObject = async imageName => {
   });
   return returnObject;
 }
+
+/**
+ * s3delete処理
+ * @param {string} imageId 
+ */
+export const s3Delete = async imageId => {
+  await Storage.remove(imageId);
+}

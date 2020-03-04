@@ -8,5 +8,6 @@ type OcrImage
 	image_name: String!
 	image_url: String
 	ocr_result: String
+	ocr_crops: String
 	trans_result: String
 }

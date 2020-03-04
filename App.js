@@ -26,11 +26,6 @@ const initialState = {
 }
 
 const HomeCom = props => {
-  /**
-   * reducer定義
-   * @param {*} state 
-   * @param {*} action 
-   */
   const reducer = (state, action) => {
     switch (action.type) {
       case 'ADD':
@@ -86,7 +81,6 @@ const HomeCom = props => {
     });
 
     getData();
-    console.log(state);
     return () => {
       subscription.unsubscribe();
     }

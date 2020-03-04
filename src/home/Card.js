@@ -2,11 +2,20 @@ import React from 'react';
 import { StyleSheet, Image } from 'react-native';
 import { Button, Card, CardItem, Icon, Left, Body, Right,View } from 'native-base';
 import { deleteImage } from '../db_function/query';
+import { s3Delete } from '../db_function/storage';
 
 const CardCom = props => {
   const navigation = props.navigation;
   const image = props.image;
   const edit = props.edit;
+
+  /**
+   * 削除処理
+   */
+  const imageDel = async kid => {
+    await s3Delete(kid);
+    await deleteImage(kid);
+  }
 
   return (
     <Card key={image.id} style={styles.card}>
@@ -15,7 +24,7 @@ const CardCom = props => {
         <Left />
         <Right>
         <Button bordered small danger
-                onPress={() => deleteImage(image.id)}>
+                onPress={() => imageDel(image.id)}>
           <Icon type="AntDesign" name="delete" />
         </Button>
         </Right>

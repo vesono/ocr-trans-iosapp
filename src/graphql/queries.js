@@ -9,6 +9,7 @@ export const getOcrImage = /* GraphQL */ `
       image_name
       image_url
       ocr_result
+      ocr_crops
       trans_result
       owner
     }
@@ -27,6 +28,7 @@ export const listOcrImages = /* GraphQL */ `
         image_name
         image_url
         ocr_result
+        ocr_crops
         trans_result
         owner
       }
@@ -57,6 +59,7 @@ export const nameListSelect = /* GraphQL */ `
         image_name
         image_url
         ocr_result
+        ocr_crops
         trans_result
         owner
       }

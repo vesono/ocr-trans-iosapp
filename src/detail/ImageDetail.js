@@ -48,7 +48,7 @@ export const ImageDetail = props => {
               </Right>
             </CardItem>
           </Card>
-          {ocrText !== '' ?
+          {ocrText !== null ?
             <Card>
               <CardItem header>
                   <Text>・読み取り結果</Text>

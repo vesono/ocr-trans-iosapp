@@ -20,8 +20,6 @@ export const insertNewImage = async (imageName, imageS3Name) => {
     user_name: 'test_user',
     image_name: imageName,
     image_url: imageS3Name,
-    ocr_result: '',
-    trans_result: '',
   };
   await API.graphql(graphqlOperation(createOcrImage, { input: newImage }));
 }

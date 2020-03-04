@@ -12,6 +12,7 @@ export const createOcrImage = /* GraphQL */ `
       image_name
       image_url
       ocr_result
+      ocr_crops
       trans_result
       owner
     }
@@ -28,6 +29,7 @@ export const updateOcrImage = /* GraphQL */ `
       image_name
       image_url
       ocr_result
+      ocr_crops
       trans_result
       owner
     }
@@ -44,6 +46,7 @@ export const deleteOcrImage = /* GraphQL */ `
       image_name
       image_url
       ocr_result
+      ocr_crops
       trans_result
       owner
     }

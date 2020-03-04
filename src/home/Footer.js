@@ -4,8 +4,9 @@ import { Button, Footer, Icon, Left, Body, Right } from 'native-base';
 import * as ImagePicker from 'expo-image-picker';
 import Constants from 'expo-constants';
 import * as Permissions from 'expo-permissions';
-import { insertNewImage } from '../../src/db_function/query';
-import { s3Upload } from '../../src/db_function/storage';
+import { insertNewImage } from '../db_function/query';
+import { s3Upload } from '../db_function/storage';
+import { logOut } from '../home/Auth';
 
 /**
  * 現在時刻取得
@@ -29,7 +30,14 @@ const getPermissionAsync = async () => {
 const FooterCom = () => {
 
   /**
-   * ライブラリーから選択して画像取得
+   * ログアウト処理
+   */
+  const _logOut = async () => {
+    await logOut();
+  }
+
+  /**
+   * 画像追加処理
    */
   const pickImage = async () => {
     await getPermissionAsync();
@@ -53,11 +61,16 @@ const FooterCom = () => {
 
   return (
     <Footer style={styles.headfooter}>
-      <Left />
+      <Left>
+        <Button transparent
+                onPress={() => _logOut()}>
+          <Icon type="Entypo" name="log-out" />
+        </Button>
+      </Left>
       <Body />
       <Right>
-      <Button transparent
-              onPress={() => pickImage()}>
+        <Button transparent
+                onPress={() => pickImage()}>
           <Icon type="AntDesign" name="plus" />
         </Button>
       </Right>
