@@ -27,13 +27,14 @@ const getPermissionAsync = async () => {
   }
 }
 
-const FooterCom = () => {
+const FooterCom = props => {
 
   /**
    * ログアウト処理
    */
   const _logOut = async () => {
     await logOut();
+    props.onStateChange('signedOut')
   }
 
   /**

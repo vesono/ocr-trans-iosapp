@@ -15,6 +15,7 @@ const CardCom = props => {
   const imageDel = async kid => {
     await s3Delete(kid);
     await deleteImage(kid);
+    props.dispatch({ type: 'DEL', kid })
   }
 
   return (

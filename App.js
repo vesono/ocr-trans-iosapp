@@ -32,8 +32,8 @@ const HomeCom = props => {
         return {...state, images: [...state.images, action.image]};
       case 'LIST':
         return {...state, images: action.images};
-      case 'DELETE':
-        return {...state, images: action.images};
+      case 'DEL':
+        return {...state, images: state.images.filter(item => item.id != action.kid)};
       default:
         return state;
     }
@@ -43,7 +43,7 @@ const HomeCom = props => {
   const [user, setUser] = useState(null);    // ユーザーのstate管理
   const [edit, setEdit] = useState(false);   // 編集モードのstate管理
 
-  const { navigation } = props;
+  const navigation = props.navigation;
   navigation.setOptions({
     headerRight: () => (
       <Button transparent 
@@ -94,13 +94,14 @@ const HomeCom = props => {
             state.images.map( image => (
             <CardCom image={image}
                      navigation={navigation}
-                     edit={edit} />
+                     edit={edit} 
+                     dispatch={dispatch}/>
             )) :
           <Text></Text>
         }
         </View>
       </Content>
-      <FooterCom />
+      <FooterCom onStateChange={props.extraData.onStateChange}/>
   </Container>
   );
 }
@@ -117,12 +118,17 @@ const styles = StyleSheet.create({
 
 const Stack = createStackNavigator();
 
-const App = () => {
+const App = props => {
+  const onStateChange = props.onStateChange;
+
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={HomeCom} />
-        <Stack.Screen name="Detail" component={ImageDetail} />
+        <Stack.Screen name="Home">
+          {props => <HomeCom {...props} extraData={{onStateChange: onStateChange}} />}
+        </Stack.Screen>
+        <Stack.Screen name="Detail"
+                      component={ImageDetail} />
       </Stack.Navigator>
     </NavigationContainer>
   );
