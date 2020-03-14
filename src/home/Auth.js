@@ -7,6 +7,9 @@ Amplify.configure(awsconfig);
 API.configure(awsconfig);
 PubSub.configure(awsconfig);
 
+/**
+ * ログアウト処理
+ */
 export const logOut = async () => {
   await Auth.signOut();
 }

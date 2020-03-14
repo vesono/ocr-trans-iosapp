@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Alert } from 'react-native';
 import { Button, Footer, Icon, Left, Body, Right } from 'native-base';
 import * as ImagePicker from 'expo-image-picker';
 import Constants from 'expo-constants';
@@ -10,11 +10,13 @@ import { logOut } from '../home/Auth';
 
 /**
  * 現在時刻取得
+ * @returns 時刻(例: 2020-01-10T18:34:18+09:00)
  */
 const nowtime = () => {
   const moment = require('moment');
-  return moment().format('YYYYMMDDHHmmssSSS');
+  return moment().format()
 }
+
 /**
  * カメラロールpermission取得
  */
@@ -38,6 +40,24 @@ const FooterCom = props => {
   }
 
   /**
+   * ログアウト確認
+   */
+  const logOutCheck = async () => {
+    Alert.alert(
+      'ログアウトしますか?',
+      '',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {text: 'OK', onPress: () => _logOut()},
+      ],
+      {cancelable: false},
+    );
+  }
+
+  /**
    * 画像追加処理
    */
   const pickImage = async () => {
@@ -53,10 +73,12 @@ const FooterCom = props => {
     if (!result.cancelled) {
       // s3追加
       const imageFileName = result.uri.split('/').slice(-1)[0];
-      const s3fileName = nowtime() + '_' + imageFileName;
+      const insertDatetime = nowtime();
+      const moment = require('moment');
+      const s3fileName = moment(insertDatetime).format('YYYYMMDDHHmmssSSS') + '_' + imageFileName;
       await s3Upload(s3fileName, result.base64);
       // DB追加
-      await insertNewImage(imageFileName, s3fileName);
+      await insertNewImage(imageFileName, s3fileName, insertDatetime);
     }
   }
 
@@ -64,7 +86,7 @@ const FooterCom = props => {
     <Footer style={styles.headfooter}>
       <Left>
         <Button transparent
-                onPress={() => _logOut()}>
+                onPress={() => logOutCheck()}>
           <Icon type="Entypo" name="log-out" />
         </Button>
       </Left>

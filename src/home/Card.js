@@ -1,8 +1,10 @@
 import React from 'react';
-import { StyleSheet, Image } from 'react-native';
+import { StyleSheet, Image, Dimensions } from 'react-native';
 import { Button, Card, CardItem, Icon, Left, Body, Right,View } from 'native-base';
 import { deleteImage } from '../db_function/query';
 import { s3Delete } from '../db_function/storage';
+
+const ITEM_WIDTH = Dimensions.get('window').width;
 
 const CardCom = props => {
   const navigation = props.navigation;
@@ -34,6 +36,7 @@ const CardCom = props => {
       }  
       <CardItem cardBody>
         <Image source={{uri: image.s3_url}}
+               resizeMode='contain'
                style={styles.image}/>
       </CardItem>
       <CardItem>
@@ -56,7 +59,7 @@ const styles = StyleSheet.create({
     flex: 0.5
   },
   image: {
-    height: 200,
+    height: 150,
     width: null,
     flex: 1
   }

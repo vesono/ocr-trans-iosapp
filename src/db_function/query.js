@@ -2,7 +2,7 @@ import Amplify from 'aws-amplify';
 import API, { graphqlOperation } from '@aws-amplify/api';
 import PubSub from '@aws-amplify/pubsub';
 import awsconfig from '../../aws-exports';
-import { listOcrImages } from '../graphql/queries';
+import { mainList } from '../graphql/queries';
 import { createOcrImage, updateOcrImage, deleteOcrImage } from '../graphql/mutations';
 import gcp_env from '../gcp_config/api_gcp_config';
 
@@ -14,12 +14,15 @@ PubSub.configure(awsconfig);
  * DB追加処理
  * @param {string} imageName 画像名
  * @param {string} imageS3Name s3 key名
+ * @param {string} insertDatetime datetime(moment)
  */
-export const insertNewImage = async (imageName, imageS3Name) => {
+export const insertNewImage = async (imageName, imageS3Name, insertDatetime) => {
+  const moment = require('moment-timezone');
   const newImage = {
     user_name: 'test_user',
     image_name: imageName,
     image_url: imageS3Name,
+    createdAt: moment(insertDatetime).tz("Asia/Tokyo").format()
   };
   await API.graphql(graphqlOperation(createOcrImage, { input: newImage }));
 }
@@ -38,6 +41,19 @@ export const updOcrResult = async (id, ocrResult) => {
 }
 
 /**
+ * 翻訳結果更新処理
+ * @param {string} id 
+ * @param {string} tsrResult 翻訳結果
+ */
+export const updTsrResult = async (id, tsrResult) => {
+  const updData = {
+    id: id,
+    trans_result: tsrResult
+  };
+  await API.graphql(graphqlOperation(updateOcrImage, {input: updData}));
+}
+
+/**
  * DB削除処理
  * @param {string} delid key id
  */
@@ -47,18 +63,22 @@ export const deleteImage = async delid => {
 }
 
 /**
- * list取得
+ * トップ画面表示リスト取得
  * @returns {array} 画像リスト表示用データ
  */
-export const listImage = async () => {
-  const listData = await API.graphql(graphqlOperation(listOcrImages));
-  return listData;
+export const listData = async () => {
+  const inputData = {
+    user_name: 'test_user',
+    sortDirection: 'DESC'
+  };
+  const data = await API.graphql(graphqlOperation(mainList, inputData));
+  return data;
 }
 
 /**
  * google cloud vision api呼び出し関数
  * @param {string} data 画像データ(base64形式)
- * @returns {string} ocr結果テキスト
+ * @returns {object} ocr結果
  */
 export const sendCloudVison = async data => {
   // json body作成
@@ -84,5 +104,5 @@ export const sendCloudVison = async data => {
     }
   );
   const resjson = await response.json();
-  return resjson.responses["0"].fullTextAnnotation.text;
+  return resjson;
 }

@@ -1,7 +1,7 @@
 type OcrImage
 	@model
 	@auth(rules: [{allow: owner}])
-	@key(name: "NameSelect", fields:["image_url", "user_name"], queryField: "NameListSelect" )
+	@key(name: "list", fields: ["user_name", "createdAt"], queryField: "mainList")
 {
 	id: ID!
 	user_name: String!
@@ -9,5 +9,7 @@ type OcrImage
 	image_url: String
 	ocr_result: String
 	ocr_crops: String
+	ocr_lang: String
 	trans_result: String
+	createdAt: AWSDateTime!
 }

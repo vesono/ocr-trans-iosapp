@@ -1,19 +1,18 @@
 import React, { useState, useReducer, useEffect } from 'react';
-import { StyleSheet} from 'react-native';
-import { Container, Content, Button, Text, Icon, View } from 'native-base';
+import { Container, Content, Button, Icon } from 'native-base';
 import Amplify, { Auth, I18n } from 'aws-amplify';
 import API, { graphqlOperation } from '@aws-amplify/api';
 import awsconfig from './aws-exports';
 import PubSub from '@aws-amplify/pubsub';
 import { withAuthenticator } from 'aws-amplify-react-native';
-import { onCreateOcrImage } from './src/graphql/subscriptions'
+import { onCreateOcrImage } from './src/graphql/subscriptions';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import CardCom from './src/home/Card';
+import FlatListCom from './src/home/FlatList';
 import FooterCom from './src/home/Footer';
 import { ImageDetail } from './src/detail/ImageDetail'
-import { listImage } from './src/db_function/query';
+import { listData } from './src/db_function/query';
 import { s3Get } from './src/db_function/storage';
 
 Amplify.configure(awsconfig);
@@ -29,7 +28,7 @@ const HomeCom = props => {
   const reducer = (state, action) => {
     switch (action.type) {
       case 'ADD':
-        return {...state, images: [...state.images, action.image]};
+        return {...state, images: [action.image, ...state.images]};
       case 'LIST':
         return {...state, images: action.images};
       case 'DEL':
@@ -61,8 +60,8 @@ const HomeCom = props => {
     }
 
     const getData = async () => {
-      const listData = await listImage();
-      const arrayData = listData.data.listOcrImages.items;
+      const listDataImage = await listData();
+      const arrayData = listDataImage.data.mainList.items;
       const arrayDataGetUrl = await Promise.all(arrayData.map( async value => ({
         ...value, s3_url: await s3Get(value.image_url)
       })));
@@ -89,32 +88,15 @@ const HomeCom = props => {
   return (
     <Container>
       <Content>
-        <View style={styles.content}>
-        { state.images.length >0 ?
-            state.images.map( image => (
-            <CardCom image={image}
+        <FlatListCom images={state.images}
                      navigation={navigation}
                      edit={edit} 
                      dispatch={dispatch}/>
-            )) :
-          <Text></Text>
-        }
-        </View>
       </Content>
       <FooterCom onStateChange={props.extraData.onStateChange}/>
   </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  content: {
-    paddingTop: 10,
-    flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'flex-start'
-  }
-});
 
 const Stack = createStackNavigator();
 
