@@ -12,7 +12,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import FlatListCom from './src/home/FlatList';
 import FooterCom from './src/home/Footer';
 import { ImageDetail } from './src/detail/ImageDetail'
-import { listData } from './src/db_function/query';
+import { listData, listDataAddObj } from './src/db_function/query';
 import { s3Get } from './src/db_function/storage';
 
 Amplify.configure(awsconfig);
@@ -29,8 +29,12 @@ const HomeCom = props => {
     switch (action.type) {
       case 'ADD':
         return {...state, images: [action.image, ...state.images]};
+      case 'UPD':
+        return {...state};
       case 'LIST':
         return {...state, images: action.images};
+      case 'LIST_PN':
+        return {...state, images: [...state.images, ...action.images]};
       case 'DEL':
         return {...state, images: state.images.filter(item => item.id != action.kid)};
       default:
@@ -41,6 +45,7 @@ const HomeCom = props => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [user, setUser] = useState(null);    // ユーザーのstate管理
   const [edit, setEdit] = useState(false);   // 編集モードのstate管理
+  const [listToken, setListToken] = useState(null);
 
   const navigation = props.navigation;
   navigation.setOptions({
@@ -59,12 +64,14 @@ const HomeCom = props => {
       return user
     }
 
+    // 初回データ取得
     const getData = async () => {
       const listDataImage = await listData();
       const arrayData = listDataImage.data.mainList.items;
-      const arrayDataGetUrl = await Promise.all(arrayData.map( async value => ({
-        ...value, s3_url: await s3Get(value.image_url)
-      })));
+      const arrayDataGetUrl = await listDataAddObj(arrayData);
+      if (listDataImage.data.mainList.nextToken !== null) {
+        setListToken(listDataImage.data.mainList.nextToken);
+      }
       dispatch({ type: 'LIST', images: arrayDataGetUrl });
     }
 
@@ -87,14 +94,14 @@ const HomeCom = props => {
 
   return (
     <Container>
-      <Content>
-        <FlatListCom images={state.images}
-                     navigation={navigation}
-                     edit={edit} 
-                     dispatch={dispatch}/>
-      </Content>
+      <FlatListCom images={state.images}
+                   navigation={navigation}
+                   edit={edit} 
+                   dispatch={dispatch}
+                   listToken={listToken}
+                   setListToken={setListToken}/>
       <FooterCom onStateChange={props.extraData.onStateChange}/>
-  </Container>
+    </Container>
   );
 }
 

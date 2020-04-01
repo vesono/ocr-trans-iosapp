@@ -12,4 +12,5 @@ type OcrImage
 	ocr_lang: String
 	trans_result: String
 	createdAt: AWSDateTime!
+
 }

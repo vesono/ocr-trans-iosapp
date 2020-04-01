@@ -4,6 +4,7 @@ import PubSub from '@aws-amplify/pubsub';
 import awsconfig from '../../aws-exports';
 import { mainList } from '../graphql/queries';
 import { createOcrImage, updateOcrImage, deleteOcrImage } from '../graphql/mutations';
+import { s3Get } from '../db_function/storage';
 import gcp_env from '../gcp_config/api_gcp_config';
 
 Amplify.configure(awsconfig);
@@ -64,15 +65,31 @@ export const deleteImage = async delid => {
 
 /**
  * トップ画面表示リスト取得
+ * @param {string} token nextToken(任意)
  * @returns {array} 画像リスト表示用データ
  */
-export const listData = async () => {
-  const inputData = {
+export const listData = async (token = null) => {
+  let inputData = {
     user_name: 'test_user',
     sortDirection: 'DESC'
   };
+  if (token != null) {
+    inputData.nextToken = token;
+  }
   const data = await API.graphql(graphqlOperation(mainList, inputData));
   return data;
+}
+
+/**
+ * dynamoDBデータからS3 objectをselectする関数
+ * @param {object} arrayData dynamoDB selectデータ
+ * @returns {object} s3urlを付与したselectデータ
+ */
+export const listDataAddObj = async (arrayData) => {
+  const arrayDataGetUrl = await Promise.all(arrayData.map( async value => ({
+    ...value, s3_url: await s3Get(value.image_url)
+  })));
+  return arrayDataGetUrl;
 }
 
 /**
