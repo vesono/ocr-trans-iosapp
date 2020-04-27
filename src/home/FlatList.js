@@ -16,7 +16,6 @@ const FlatListCom = props => {
     console.log("end reached");
     if (listToken !== null) {
       const result = await listData(listToken);
-      console.log(result)
       const arrayData = result.data.mainList.items;
       const images = await listDataAddObj(arrayData);
       setListToken(result.data.mainList.nextToken);

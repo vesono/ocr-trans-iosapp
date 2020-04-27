@@ -12,6 +12,7 @@ const ITEM_WIDTH = Dimensions.get('window').width;
 export const ImageDetail = props => {
   const navigation = props.navigation;
   const image = props.route.params.image;
+  const dispatch = props.route.params.dispatch;
   const [ocrText, setOcr] = useState(image.ocr_result);
   const [tsrText, setTsr] = useState(image.trans_result);
 
@@ -42,7 +43,6 @@ const ImageDetailCom = props => {
     const imageData = await s3GetObject(imageName)
     const imageDataBase64 = imageData.Body.toString('base64')
     const result = await sendCloudVison(imageDataBase64);
-    console.log(result);
     const ocrText = result.responses["0"].fullTextAnnotation.text;
     await updOcrResult(id, ocrText);
     setOcr(ocrText);

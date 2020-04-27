@@ -4,12 +4,11 @@ import { Button, Card, CardItem, Icon, Left, Body, Right,View } from 'native-bas
 import { deleteImage } from '../db_function/query';
 import { s3Delete } from '../db_function/storage';
 
-const ITEM_WIDTH = Dimensions.get('window').width;
-
 const CardCom = props => {
   const navigation = props.navigation;
   const image = props.image;
   const edit = props.edit;
+  const dispatch = props.dispatch;
 
   /**
    * 削除処理
@@ -26,10 +25,10 @@ const CardCom = props => {
       <CardItem>
         <Left />
         <Right>
-        <Button bordered small danger
-                onPress={() => imageDel(image.id)}>
-          <Icon type="AntDesign" name="delete" />
-        </Button>
+          <Button bordered small danger
+                  onPress={() => imageDel(image.id)}>
+            <Icon type="AntDesign" name="delete" />
+          </Button>
         </Right>
       </CardItem>
         : <View />
@@ -44,7 +43,8 @@ const CardCom = props => {
         <Right>
           <Button bordered small
                   onPress={() => navigation.navigate('Detail', {
-                    image: image
+                    image: image,
+                    dispatch: dispatch
                   })}>
            <Icon type="AntDesign" name="ellipsis1" />
          </Button>

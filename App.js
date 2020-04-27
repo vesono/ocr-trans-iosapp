@@ -5,7 +5,7 @@ import API, { graphqlOperation } from '@aws-amplify/api';
 import awsconfig from './aws-exports';
 import PubSub from '@aws-amplify/pubsub';
 import { withAuthenticator } from 'aws-amplify-react-native';
-import { onCreateOcrImage } from './src/graphql/subscriptions';
+import { onCreateOcrImage, onUpdateOcrImage } from './src/graphql/subscriptions';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -30,7 +30,13 @@ const HomeCom = props => {
       case 'ADD':
         return {...state, images: [action.image, ...state.images]};
       case 'UPD':
-        return {...state};
+        return {...state, images: [...state.images.map(v => {
+          if (v.id === action.image.id) {
+            return action.image;
+          } else {
+            return v;
+          }
+        })]};
       case 'LIST':
         return {...state, images: action.images};
       case 'LIST_PN':
@@ -75,20 +81,28 @@ const HomeCom = props => {
       dispatch({ type: 'LIST', images: arrayDataGetUrl });
     }
 
-    let subscription;
+    let subscriptionAdd;
+    let subscriptionUpd;
     getUser().then(user => {
-      subscription = API.graphql(graphqlOperation(onCreateOcrImage, {owner: user.username})).subscribe({
+      subscriptionAdd = API.graphql(graphqlOperation(onCreateOcrImage, {owner: user.username})).subscribe({
         next: async eventData => {
           const image = eventData.value.data.onCreateOcrImage;
           image.s3_url = await s3Get(image.image_url);
           dispatch({ type: 'ADD', image });
         }
       });
+      subscriptionUpd = API.graphql(graphqlOperation(onUpdateOcrImage, {owner: user.username})).subscribe({
+        next: async eventData => {
+          const image = eventData.value.data.onUpdateOcrImage;
+          dispatch({ type: 'UPD', image });
+        }
+      });
     });
 
     getData();
     return () => {
-      subscription.unsubscribe();
+      subscriptionAdd.unsubscribe();
+      subscriptionUpd.unsubscribe();
     }
   }, []);
 
